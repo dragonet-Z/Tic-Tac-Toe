@@ -6,7 +6,7 @@
 /*
 project name: 井字棋（Tic-Tac-Toe）
 author name: dragonet
-date: 2020/7/15——2020/7/22（版本2）
+date: 2020/7/15——2020/8/16（版本3）
 */
 
 /*
@@ -15,6 +15,10 @@ BUG与优化1：
 2. 取消原先的权重计算方法，（效率过低），现改为直接堵门或者直接三连，如果都不行就直接随机数
 3. 增加times全局变量记录同行、列、对角线上同种棋的个数，将原先两种棋在一起判断改为分开判断，增加效率
 4. 选择下棋逻辑，根据玩家输入的电脑下棋模式，优先选择堵门或者三连O(∩_∩)O
+
+BUG与优化2：
+1. 修改了step的计算方法
+2. 
 */
 
 /*全局变量区*/
@@ -45,19 +49,19 @@ int main()
 	printf_s("请输入想要玩的模式(1代表自娱自乐，2代表人机对战)：");
 	scanf_s("%d", &n);
 	if (leagality_check(n, 1, 2) == 0) goto Mode_choice;
+	gotoxy(0, 0);
 	if (n == 2)
 	{
-		gotoxy(0, 0);
-		for (n = 0; n < 200; ++n)   printf_s("                                                                                             \n"); //清空所有
+		for (n = 0; n < 200; ++n)
+		printf_s("                                                                                             \n"); //清空所有
 		play_computer();
 	}
 	else
 	{
-		gotoxy(0, 0);
-		for (n = 0; n < 200; ++n)   printf_s("                                                                                             \n"); //清空所有
+		for (n = 0; n < 200; ++n)
+		printf_s("                                                                                             \n"); //清空所有
 		play_own();
-	}
-
+	}	
 	gotoxy(23, 22);
 	system("pause");
 	return 0;
@@ -162,16 +166,9 @@ void play_own()
 		printf_s("╔      ═      ╗");
 		gotoxy(54, 11);
 		printf_s("╚      ═      ╝");
-		if (temp == 1)
-		{
-			gotoxy(55, 10);
-			printf_s("当前棋子：◆");
-		}
-		if (temp == -1)
-		{
-			gotoxy(55, 10);
-			printf_s("当前棋子：★");
-		}
+		gotoxy(55, 10);
+		if (temp == 1)       printf_s("当前棋子：◆");
+		if (temp == -1)      printf_s("当前棋子：★");
 /*----------------------------------------------------------*/
 	own_play:
 		/*先清空原先输入的坐标*/
@@ -220,8 +217,8 @@ void play_computer()
 	player = 1; //玩家先出手 （1为玩家，-1为电脑）
 	int temp = 1; //1为◆状态，-1为★状态
 	int x, y; //行、列坐标
-	menu(); //介绍面板
-	draw(); //初始化棋盘面板
+	menu();
+	draw();
 COM_play_mode:
 	gotoxy(26, 22);
 	printf_s("你想设置电脑的下棋模式为防守/进攻为主？(0-1)：                   "); //清空
@@ -229,102 +226,89 @@ COM_play_mode:
 	printf_s("你想设置电脑的下棋模式为防守/进攻为主？(0-1)：");
 	scanf_s("%d", &offence_defence);
 	if (leagality_check(offence_defence, 0, 1) == 0)   goto COM_play_mode;
-	if (offence_defence == 0)
-	{
-		gotoxy(55, 12);
-		printf_s("当前电脑下棋模式：防守");
-	}
-	else
-	{
-		gotoxy(55, 12);
-		printf_s("当前电脑下棋模式：进攻");
-	}
+	gotoxy(55, 12);
+	if (offence_defence == 0)        printf_s("当前电脑下棋模式：防守");
+	else   printf_s("当前电脑下棋模式：进攻");
 	while (1)
 	{
 		if (win_check() != 0)   break;
-		++step; //步数增加
-		gotoxy(20, 22);
-		printf_s("                                                                    ");
-		/*-------------------打印当前棋子信息-----------------------*/
-		gotoxy(54, 9);
-		printf_s("╔      ═      ╗");
-		gotoxy(54, 11);
-		printf_s("╚      ═      ╝");
-		if (temp == 1)
+		if (step < 9)
 		{
+			gotoxy(20, 22);
+			printf_s("                                                                    ");
+			/*-------------------打印当前棋子信息-----------------------*/
+			gotoxy(54, 9);
+			printf_s("╔      ═      ╗");
+			gotoxy(54, 11);
+			printf_s("╚      ═      ╝");
 			gotoxy(55, 10);
-			printf_s("当前棋子：◆");
-		}
-		if (temp == -1)
-		{
-			gotoxy(55, 10);
-			printf_s("当前棋子：★");
-		}
-		/*----------------------------------------------------------*/
-	com_play:
-		/*先清空原先输入的坐标*/
-		gotoxy(54, 17);
-		printf_s("请输入行坐标（1-3）:                ");
-		gotoxy(54, 18);
-		printf_s("请输入列坐标（1-3）：               ");
-		gotoxy(26, 22);
-		printf_s("                                            ");
-		/*----------------------------------------------------------*/
-		if (player = 1)
-		{
+			if (temp == 1)             printf_s("当前棋子：◆");
+			if (temp == -1)            printf_s("当前棋子：★");
+			/*----------------------------------------------------------*/
+		com_play:
+			/*先清空原先输入的坐标*/
 			gotoxy(54, 17);
-			printf_s("请输入行坐标（1-3）:");
-			scanf_s("%d", &x);
-			if (leagality_check(x, 1, 3) == 0)  goto com_play;
+			printf_s("请输入行坐标（1-3）:                ");
 			gotoxy(54, 18);
-			printf_s("请输入列坐标（1-3）:");
-			scanf_s("%d", &y);
-			if (leagality_check(y, 1, 3) == 0)  goto com_play;
-			if (board[x - 1][y - 1] == 0)
+			printf_s("请输入列坐标（1-3）：               ");
+			gotoxy(26, 22);
+			printf_s("                                            ");
+			/*----------------------------------------------------------*/
+			if (player == 1)
 			{
-				board[x - 1][y - 1] = temp;
-				update();
-				temp *= -1;
+				gotoxy(54, 17);
+				printf_s("请输入行坐标（1-3）:");
+				scanf_s("%d", &x);
+				if (leagality_check(x, 1, 3) == 0)  goto com_play;
+				gotoxy(54, 18);
+				printf_s("请输入列坐标（1-3）:");
+				scanf_s("%d", &y);
+				if (leagality_check(y, 1, 3) == 0)  goto com_play;
+				if (board[x - 1][y - 1] == 0)
+				{
+					board[x - 1][y - 1] = temp;
+					update();
+					temp *= -1;
+				}
+				else
+				{
+					gotoxy(26, 22);
+					printf_s("该坐标已有棋，请重下！");
+					getchar();
+					getchar(); //让玩家看得到信息
+					goto com_play;
+				}
+				++step;
+				player *= -1; //玩家先出手 （1为玩家，-1为电脑）
+				continue;
 			}
-			else
-			{
-				gotoxy(26, 22);
-				printf_s("该坐标已有棋，请重下！");
-				getchar();
-				getchar(); //让玩家看得到信息
-				goto com_play;
-			}
-			player *= -1; //玩家先出手 （1为玩家，-1为电脑）
-		}
-		
-		if (player = -1)
-		{
-		/*------------单纯为了好玩，让玩家不会觉得自己孤独-------------*/
-			gotoxy(23, 22);
-			printf_s("电脑正在思考，请输入任意键以继续");
-			getchar();
-			getchar();
 
-			if (step < 9) //玩家先下棋的话，电脑就只能最多下到第八个棋
+			if (player == -1)
 			{
 				switch (weight_and_choose())
 				{
-				case 1: if (board[0][0] == 0) board[0][0] = -1;  break;
-				case 2: if (board[0][1] == 0) board[0][1] = -1;  break;
-				case 3: if (board[0][2] == 0) board[0][2] = -1;  break;
-				case 4: if (board[1][0] == 0) board[1][0] = -1;  break;
-				case 5: if (board[1][1] == 0) board[1][1] = -1;  break;
-				case 6: if (board[1][2] == 0) board[1][2] = -1;  break;
-				case 7: if (board[2][0] == 0) board[2][0] = -1;  break;
-				case 8: if (board[2][1] == 0) board[2][1] = -1;  break;
-				case 9: if (board[2][2] == 0) board[2][2] = -1;  break;
+					case 1: if (board[0][0] == 0) board[0][0] = -1;  break;
+					case 2: if (board[0][1] == 0) board[0][1] = -1;  break;
+					case 3: if (board[0][2] == 0) board[0][2] = -1;  break;
+					case 4: if (board[1][0] == 0) board[1][0] = -1;  break;
+					case 5: if (board[1][1] == 0) board[1][1] = -1;  break;
+					case 6: if (board[1][2] == 0) board[1][2] = -1;  break;
+					case 7: if (board[2][0] == 0) board[2][0] = -1;  break;
+					case 8: if (board[2][1] == 0) board[2][1] = -1;  break;
+					case 9: if (board[2][2] == 0) board[2][2] = -1;  break;
 				}
+/*------------单纯为了好玩，让玩家不会觉得自己孤独-------------*/
+				gotoxy(23, 22);
+				printf_s("电脑正在思考，请输入任意键以继续");
+				getchar();
+				getchar();
 				update();
 				temp *= -1;
 				player *= -1;
+				++step;
+				continue;
 			}
 		}
-		
 	}
 	switch (win_check())
 	{
